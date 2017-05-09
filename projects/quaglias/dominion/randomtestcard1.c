@@ -1,85 +1,71 @@
 #include "dominion.h"
-#include "dominion_helpers.h"
 #include "rngs.h"
-#include <assert.h>
-#include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include <time.h>
+#include <stdlib.h>
+#include <assert.h>
 
-#define MAX_TESTS 100
+#define MAX_TEST 500
 
 int main()
 {
-    printf (":::: ADVENTURER RANDOM TESTER START ::::\n");
-
 	struct gameState G;
-  	int players1;
-  	int players2;
-  	int random_seed;
-  	int pre_handCount = 0;
-  	int post_handCount = 0;
-  	int card = 0;
-  	int i = 0;
-  	int j = 0;
-  	int k[10] = {adventurer, gardens, embargo, village, minion, mine, cutpurse, smithy, sea_hag, tribute};
+	int result;
+	int random = 0;
+	int player = 1;
+	int handCount;
+	int deckCount;
+	int passed = 0;
+	int failed = 0;
+	int i;
+	int k[10] = {adventurer, gardens, embargo, village, minion, mine, cutpurse,	sea_hag, tribute, smithy};
+	
+    printf (":::: SALVAGER RANDOM TESTER START ::::\n");
+	
 
-    for(i = 0; i < MAX_TESTS; i++)
-    {
-        //Initialize variables
-        players1 = rand() % 4;
-        players2 = rand() % 4;
-        random_seed = rand();
+	for(i = 0; i < MAX_TEST; i++)
+	{
+		//set basic information
+		printf("Try #%d: \n", i);
+		int numPlayers = rand() % 4;
+		int gameSeed = rand() % 5000;
 
-        initializeGame(players1, k, random_seed, &G);
+		//initializes gameState
+		initializeGame(numPlayers, k, gameSeed, &G);
 
-        //Initialize game state information
-        G.deckCount[players2] = rand() % MAX_DECK;
-        G.discardCount[players2] =  rand() % MAX_DECK;
-        G.handCount[players2] =  rand() % MAX_HAND;
+		random = rand() % 10;
+		
+		if(random == 5)
+		{
+			G.deckCount[player] = 0;
+			deckCount = 0;
+		}
+		else
+		{
+			random = rand() % MAX_DECK;
+			G.deckCount[player] = random;
+			deckCount = random;
+		}
 
-        G.hand[players2][0] = adventurer;
+		random = rand() % MAX_DECK;
+		G.handCount[player] = rand() % MAX_HAND;
+		handCount = random;
 
-        for(j = 1; j < G.handCount[players2]; j++)
-        {
-            card = rand() % treasure_map;
-            if(G.supplyCount[card] > -1)
-            {
-                G.hand[players2][j] = card;
-            }
-        }
+		G.discardCount[player] = rand() % MAX_DECK;
 
-        for(j = 0; j < G.deckCount[players2]; j++)
-        {
-            card = rand() % treasure_map;
-            if(G.supplyCount[card] > -1)
-            {
-                G.deck[players2][j] = card;
-            }
-        }
+		result = Salvager(&G, player, 1, 1);
+		
+		if(result == 0)
+		{
+			printf("Test #%d Passed\n", i);
+			passed++;
+		}
+		else
+		{
+			printf("Test #%d Failed\n", i);
+			failed++;
+		}
+	}
 
-        pre_handCount = G.handCount[players2];
-
-
-        playCard(0,0,0,0, &G);  //Call adventurer
-
-        post_handCount = G.handCount[players2];
-
-        printf ("handCount prior: %d\n", pre_handCount);
-        printf ("handCount after: %d\n", post_handCount);
-
-        if(pre_handCount == post_handCount)
-        {
-            printf("handCount prior and handCount post are equal, test passed.\n");
-        }
-        else
-        {
-            printf("handCount prior and handCount post are not equal, test failed.\n");
-        }
-
-
-
-    }
-    printf (":::: ADVENTURER RANDOM TESTER END ::::\n");
-	return 0;
+	printf (":::: SALVAGER RANDOM TESTER END ::::\n");
 }
