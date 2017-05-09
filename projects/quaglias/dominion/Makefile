@@ -73,6 +73,28 @@ unittestresult.out: unit1 unit2 unit3 unit4 card1 card2 card3 card4
 	gcov dominion.c >> unittestresults.out
 	cat dominion.c.gcov >> unittestresults.out
 	
+randomtestcard1: dominion.o playdom.c
+	gcc -fprofile-arcs -ftest-coverage -Wall -std=c99 dominion.o randomtestcard1.c rngs.c -o randomtestcard1 -lm -g
+	
+randomtestcard2: dominion.o playdom.c
+	gcc -fprofile-arcs -ftest-coverage -Wall -std=c99 dominion.o randomtestcard2.c rngs.c -o randomtestcard2 -lm -g	
+	
+randomtestadventurer: dominion.o playdom.c
+	gcc -fprofile-arcs -ftest-coverage -Wall -std=c99 dominion.o randomtestadventurer.c rngs.c -o randomtestadventurer -lm -g
+	
+randomtestcardresults.out: randomtestcard1 randomtestcard2 randomtestadventurer
+	./randomtestcard1 &> randomtestcardresults.out
+	./randomtestcard2 >> randomtestcardresults.out
+	./randomtestadventurer >> randomtestcardresults.out
+	gcov randomtestcard1.c >> randomtestcardresults.out
+	cat randomtestcard1.c.gcov >> randomtestcardresults.out	
+	gcov randomtestcard2.c >> randomtestcardresults.out
+	cat randomtestcard2.c.gcov >> randomtestcardresults.out
+	gcov randomtestadventurer.c >> randomtestcardresults.out
+	cat randomtestadventurer.c.gcov >> randomtestcardresults.out
+	gcov dominion.c >> randomtestcardresults.out
+	cat dominion.c.gcov >> randomtestcardresults.out
+	
 interface.o: interface.h interface.c
 	gcc -c interface.c -g  $(CFLAGS)
 
